@@ -16,13 +16,20 @@ void GridRow::deleteItems() {
 void GridRow::copyFrom(const GridRow& other) {
 	for (size_t i = 0; i < other.size; i++)
 	{
-		//addItem(*other.items[i]);
+		if (other.items[i] != nullptr)
+		{
+			this->items[i] = other.items[i];
+		}
 	}
 }
 
 GridRow::GridRow(const size_t size) {
 	items = new Item * [size];
 	this->size = size;
+	for (size_t i = 0; i < size; i++)
+	{
+		items[i] = nullptr;
+	}
 }
 
 GridRow::GridRow(const GridRow& other) {
@@ -40,4 +47,40 @@ const GridRow& GridRow::operator=(const GridRow& other) {
 
 GridRow::~GridRow() {
 	free();
+}
+
+void GridRow::Print(ostream& out) const {
+	for (size_t i = 0; i < size; i++)
+	{
+		if (items[i] != nullptr)
+		{
+			(*items[i]).Print(out);
+		}
+
+		out << "|";
+	}
+}
+
+void GridRow::setItem(const Item& item, const size_t col) {
+	if (col >= size) throw "Wrong col";
+	delete this->items[col];
+	this->items[col] = item.Clone();
+}
+
+const Item* GridRow::operator[](const size_t index) const {
+	if (index >= size)
+	{
+		throw "Wrong row";
+	}
+
+	return items[index];
+}
+
+Item* GridRow::operator[](const size_t index) {
+	if (index >= size)
+	{
+		throw "Wrong row";
+	}
+
+	return items[index];
 }

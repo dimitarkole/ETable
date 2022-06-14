@@ -140,17 +140,25 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Common.cpp" />
+    <ClCompile Include="Engine.cpp" />
+    <ClCompile Include="FloatItem.cpp" />
     <ClCompile Include="ETable.cpp" />
     <ClCompile Include="Grid.cpp" />
     <ClCompile Include="GridRow.cpp" />
-    <ClCompile Include="NumberItem.cpp" />
+    <ClCompile Include="IntegerItem.cpp" />
+    <ClCompile Include="ItemFactory.cpp" />
     <ClCompile Include="StringItem.cpp" />
     <ClCompile Include="Item.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Common.h" />
+    <ClInclude Include="Engine.h" />
+    <ClInclude Include="FloatItem.h" />
     <ClInclude Include="Grid.h" />
     <ClInclude Include="GridRow.h" />
-    <ClInclude Include="NumberItem.h" />
+    <ClInclude Include="IntegerItem.h" />
+    <ClInclude Include="ItemFactory.h" />
     <ClInclude Include="StringItem.h" />
     <ClInclude Include="Item.h" />
   </ItemGroup>

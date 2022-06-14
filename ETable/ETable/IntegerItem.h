@@ -3,12 +3,13 @@
 #include<iostream>
 #include<string>
 using namespace std;
-class NumberItem : Item
+class IntegerItem : public Item
 {
 	int number;
 public:
-	NumberItem(const int number = 0);
+	IntegerItem(const int number = 0);
 	Item* Clone() const override;
 	void Print(ostream& out) const override;
 	void Read(istream& in) override;
+	IntegerItem& operator=(const IntegerItem& other) = default;
 };

@@ -3,13 +3,14 @@
 #include<iostream>
 #include<string>
 using namespace std;
-class StringItem : public Item
+class FloatItem : public Item
 {
-	string data;
+	float number;
 public:
-	StringItem(const string data = "");
+	FloatItem(const float number = 0);
 	Item* Clone() const override;
 	void Print(ostream& out) const override;
 	void Read(istream& in) override;
-	StringItem& operator=(const StringItem& other) = default;
+	FloatItem& operator=(const FloatItem& other) = default;
 };
+

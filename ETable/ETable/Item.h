@@ -7,6 +7,7 @@ enum ItemType {
 	Integer = 1,
 	Float = 2,
 	String = 3,
+	Formula = 4,
 };
 
 class Item
