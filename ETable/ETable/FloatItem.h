@@ -12,5 +12,6 @@ public:
 	void Print(ostream& out) const override;
 	void Read(istream& in) override;
 	FloatItem& operator=(const FloatItem& other) = default;
+	float getValue() const override;
 };
 

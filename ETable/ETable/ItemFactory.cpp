@@ -23,6 +23,8 @@ Item* ItemFactory::createItem(const string& item) const {
 	ItemType type = getItemType(item);
 	switch (type)
 	{
+	case ItemType::Formula:
+		return new FormulaItem(item);
 	case ItemType::Integer:
 		return new IntegerItem(convertToNumber(item));
 	case ItemType::Float:

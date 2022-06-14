@@ -20,4 +20,5 @@ public:
 	const ItemType GetType() const;
 	virtual void Print(ostream& out) const = 0;
 	virtual void Read(istream& in) = 0;
+	virtual float getValue() const = 0;
 };

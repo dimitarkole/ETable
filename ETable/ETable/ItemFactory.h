@@ -4,6 +4,7 @@
 #include "IntegerItem.h"
 #include "FloatItem.h"
 #include "StringItem.h"
+#include "FormulaItem.h"
 #include <iostream>
 #include <string>
 using namespace std;

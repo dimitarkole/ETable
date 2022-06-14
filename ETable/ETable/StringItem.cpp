@@ -17,3 +17,7 @@ void StringItem::Print(ostream& out) const {
 void StringItem::Read(istream& in) {
 	getline(cin, data, '|');
 };
+
+float StringItem::getValue() const {
+	return 0;
+}

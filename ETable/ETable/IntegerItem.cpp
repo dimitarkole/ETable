@@ -15,3 +15,7 @@ void IntegerItem::Print(ostream& out) const {
 void IntegerItem::Read(istream& in) {
 	cin >> number;
 };
+
+float IntegerItem::getValue() const {
+	return number;
+}

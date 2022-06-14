@@ -1,7 +1,13 @@
 #pragma once
 #include "Item.h"
+#include "ItemFactory.h"
+#include<iostream>
+#include<string>
+
+using namespace std;
 class GridRow
 {	
+	ItemFactory itemFactory;
 	Item** items;
 	size_t size;
 	void free();
@@ -19,5 +25,6 @@ public:
 	void Print(ostream& out) const;
 	const Item* operator[](const size_t index) const;
 	Item* operator[](const size_t index);
-	// virtual void Read(istream& in) = 0;
+	void read(istream& in);
+	float getItemValue(const size_t col) const;
 };

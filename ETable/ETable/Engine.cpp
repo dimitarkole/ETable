@@ -23,18 +23,35 @@ void Engine::run() {
         do {
             cout << "Input command" << endl;
             getline(cin, command);
-            if (command == "Create grid")
+            if (command == "Clear")
             {
-                grid = inputGridFromConsole();
+                system("CLS");
             }
-            else if (command == "Print grid")
+            else if (command == "Create grid")
             {
-                grid->Print(cout);
+                inputGridFromConsole();
+            }
+            else if (command == "Print")
+            {
+                grid->print(cout);
             }
             else if (command.find("SaveAs") == 0)
             {
                 string fileName = command.substr(command.find(' ') + 1);
                 saveAs(fileName);
+            }
+            else if (command == "Save")
+            {
+                saveAs(this->openFileName);
+            }
+            else if (command.find("Read") == 0)
+            {
+                string fileName = command.substr(command.find(' ') + 1);
+                readFrom(fileName);
+            }
+            else if (command.find("Edit") == 0)
+            {
+                changeItem(command.substr(command.find(' ') + 1));
             }
             else if (command == "Help")
             {
@@ -45,6 +62,7 @@ void Engine::run() {
                 cout << "Wrong command" << endl;
             }
         } while (command != "End");
+        delete this->grid;
     }
     catch (const std::exception& ex)
     {
@@ -56,13 +74,18 @@ void Engine::printCommands()
 {
     cout << "Commands:" << endl;
     cout << "Create grid" << endl;
-    cout << "Print grid" << endl;
+    cout << "Print" << endl;
+    cout << "Save" << endl;
     cout << "SaveAs fileName.dat" << endl;
+    cout << "Read fileName.dat" << endl;
+    cout << "Edit row col data" << endl;
     cout << "Help" << endl;
+    cout << "Clear" << endl;
     cout << "End" << endl;
 }
 
-Grid* Engine::inputGridFromConsole() {
+void Engine::inputGridFromConsole() {
+    if (!willRefillGrid()) return;
     cout << "Input grid size: ";
     size_t size;
     cin >> size;
@@ -74,21 +97,21 @@ Grid* Engine::inputGridFromConsole() {
     cin.get(newLine);
     getline(cin, data, '\n');
     while (data != "End") {
-        indexOfEndOfRow = data.find(' ');
-        indexOfEndOfCol = data.find(' ', indexOfEndOfRow + 1);
-        row = convertToNumber(data.substr(0, indexOfEndOfRow));
-        col = convertToNumber(data.substr(indexOfEndOfRow + 1, indexOfEndOfCol - 2));
-        string itemData = data.substr(indexOfEndOfCol + 1);
-        Item* item = itemFactory.createItem(itemData);
-        grid->setItem(row, col, item);
+        changeItem(data);
         getline(cin, data);
     }
 
-    return grid;
+    delete this->grid;
+    this->grid = grid;
 }
 
-void Engine::saveAs(const string& fileName) {
-    ofstream file(fileName, ios::binary);
+void Engine::saveAs(const string& fileName) const {
+    if (!isGridSet) { 
+        cout << "No any data in grid" << endl;
+        return; 
+    }
+
+    ofstream file(fileName);
     if (!file.is_open()) {
         cout << "File is not opened!" << endl;
         return;
@@ -96,9 +119,74 @@ void Engine::saveAs(const string& fileName) {
 
     try
     {
-        grid->Print(file);
+        grid->print(file);
     }
     catch (const std::exception&)
     {
     }
+}
+
+void Engine::readFrom(const string& fileName) {
+    if (!willRefillGrid()) return;
+
+    this->openFileName = fileName;
+    ifstream file(fileName);
+    if (!file.is_open()) {
+        cout << "File is not opened!" << endl;
+        return;
+    }
+
+    try
+    {
+        size_t size;
+        file >> size;
+        Grid* grid = new Grid(size);
+        grid->read(file);
+        delete this->grid;
+        this->grid = grid;
+    }
+    catch (const std::exception&)
+    {
+    }
+}
+
+void Engine::changeItem(const string& data) {
+    if (!isGridSet) {
+        cout << "No any data in grid" << endl;
+        return;
+    }
+    size_t indexOfEndOfRow, indexOfEndOfCol, col, row;
+    indexOfEndOfRow = data.find(' ');
+    indexOfEndOfCol = data.find(' ', indexOfEndOfRow + 1);
+    row = convertToNumber(data.substr(0, indexOfEndOfRow));
+    col = convertToNumber(data.substr(indexOfEndOfRow + 1, indexOfEndOfCol - 2));
+    string itemData = data.substr(indexOfEndOfCol + 1);
+    Item* item = itemFactory.createItem(itemData);
+    if (item->GetType() != ItemType::Formula)
+    {
+        grid->setItem(row, col, item);
+      
+    }
+    else {
+        Item* formulaResult = grid->calculateWithFormula(itemData);
+        formulaResult->Print(cout);
+        cout << endl;
+        grid->setItem(row, col, formulaResult);
+    }
+
+    delete item;
+    return;
+}
+
+bool Engine::willRefillGrid()
+{
+    if (isGridSet)
+    {
+        cout << "Grid is full. Do you want to change it? Yes/No" << endl;
+        string response;
+        getline(cin, response, '\n');
+        if (response != "Yes") return false;
+    }
+
+    return true;
 }

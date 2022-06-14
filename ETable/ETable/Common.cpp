@@ -3,15 +3,20 @@
 bool isContainsNumbers(const string& str) {
 	size_t strLen = str.length();
 	if (str == "") return false;
-	char digit = str[1];
-	if (!(digit >= '0' && digit <= '9')) {
+	char digit = str[0];
+	if ((digit == '+' || digit == '-') && (strLen >= 2)
+		&& !(str[1] >= '0' && str[1] <= '9')) {
+			return false;
+	}
+	else if (!(digit >= '0' && digit <= '9')) {
 		return false;
 	}
 
 	for (size_t i = 1; i < strLen; i++)
 	{
 		digit = str[i];
-		if (!(digit >= '0' && digit <= '9') && !(digit == '.' || digit == ','))
+		if (!(digit >= '0' && digit <= '9') 
+			&& !(digit == '.' || digit == ','))
 		{
 			return false;
 		}
@@ -23,9 +28,18 @@ bool isContainsNumbers(const string& str) {
 bool isContainsOnlyNumbers(const string& str) {
 	size_t strLen = str.length();
 	if (str == "") return false;
+	char digit = str[0];
+	if ((digit == '+' || digit == '-') && (strLen >= 2)  
+		&& !(str[1] >= '0' && str[1] <= '9')) {
+		return false;
+	}
+	else if (!(digit >= '0' && digit <= '9')) {
+		return false;
+	}
+
 	for (size_t i = 1; i < strLen; i++)
 	{
-		char digit = str[i];
+		digit = str[i];
 		if (!(digit >= '0' && digit <= '9'))
 		{
 			return false;

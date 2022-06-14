@@ -11,5 +11,6 @@ public:
 	Item* Clone() const override;
 	void Print(ostream& out) const override;
 	void Read(istream& in) override;
+	float getValue() const override;
 	IntegerItem& operator=(const IntegerItem& other) = default;
 };

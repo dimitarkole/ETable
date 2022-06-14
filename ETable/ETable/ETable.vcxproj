@@ -144,6 +144,7 @@
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="FloatItem.cpp" />
     <ClCompile Include="ETable.cpp" />
+    <ClCompile Include="FormulaItem.cpp" />
     <ClCompile Include="Grid.cpp" />
     <ClCompile Include="GridRow.cpp" />
     <ClCompile Include="IntegerItem.cpp" />
@@ -155,6 +156,7 @@
     <ClInclude Include="Common.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="FloatItem.h" />
+    <ClInclude Include="FormulaItem.h" />
     <ClInclude Include="Grid.h" />
     <ClInclude Include="GridRow.h" />
     <ClInclude Include="IntegerItem.h" />
