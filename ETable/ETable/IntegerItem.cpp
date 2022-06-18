@@ -19,3 +19,16 @@ void IntegerItem::Read(istream& in) {
 float IntegerItem::getValue() const {
 	return number;
 }
+
+size_t IntegerItem::getValueLen() const {
+	return trunc(log10(abs(number))) + 1 + (number < 0); // number len + sign
+}
+
+void IntegerItem::Print(ostream& out, const size_t len) const {
+	size_t newLen = len - getValueLen();
+	out << number << setw(len - getValueLen());
+};
+
+string IntegerItem::getData() const {
+	return to_string(number);
+}

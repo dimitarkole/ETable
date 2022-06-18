@@ -20,6 +20,7 @@ void Engine::run() {
         string command;
         system("CLS");
         printCommands();
+        this->isGridSet = false;
         do {
             cout << "Input command" << endl;
             getline(cin, command);
@@ -33,7 +34,10 @@ void Engine::run() {
             }
             else if (command == "Print")
             {
-                grid->print(cout);
+                if (!isGridSet) {
+                    cout << "No any data in grid" << endl;
+                }
+                else grid->printWithSpaces(cout);
             }
             else if (command.find("SaveAs") == 0)
             {
@@ -103,6 +107,7 @@ void Engine::inputGridFromConsole() {
 
     delete this->grid;
     this->grid = grid;
+    isGridSet = true;
 }
 
 void Engine::saveAs(const string& fileName) const {
@@ -144,6 +149,7 @@ void Engine::readFrom(const string& fileName) {
         grid->read(file);
         delete this->grid;
         this->grid = grid;
+        isGridSet = true;
     }
     catch (const std::exception&)
     {
@@ -162,18 +168,7 @@ void Engine::changeItem(const string& data) {
     col = convertToNumber(data.substr(indexOfEndOfRow + 1, indexOfEndOfCol - 2));
     string itemData = data.substr(indexOfEndOfCol + 1);
     Item* item = itemFactory.createItem(itemData);
-    if (item->GetType() != ItemType::Formula)
-    {
-        grid->setItem(row, col, item);
-      
-    }
-    else {
-        Item* formulaResult = grid->calculateWithFormula(itemData);
-        formulaResult->Print(cout);
-        cout << endl;
-        grid->setItem(row, col, formulaResult);
-    }
-
+    grid->setItem(row, col, item);
     delete item;
     return;
 }
@@ -186,6 +181,7 @@ bool Engine::willRefillGrid()
         string response;
         getline(cin, response, '\n');
         if (response != "Yes") return false;
+        else delete grid;
     }
 
     return true;

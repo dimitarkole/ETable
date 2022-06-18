@@ -3,7 +3,7 @@
 #include "ItemFactory.h"
 #include<iostream>
 #include<string>
-
+#include <iomanip>
 using namespace std;
 class GridRow
 {	
@@ -22,7 +22,9 @@ public:
 	~GridRow();
 
 	void setItem(const Item& item, const size_t index);
+	void setItem(const Item* item, const size_t index);
 	void Print(ostream& out) const;
+	void Print(ostream& out, const size_t* lens) const;
 	const Item* operator[](const size_t index) const;
 	Item* operator[](const size_t index);
 	void read(istream& in);

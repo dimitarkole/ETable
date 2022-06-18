@@ -3,8 +3,10 @@
 void Grid::copyFrom(const Grid& other) {
 	size = other.size;
 	rows = new GridRow * [size];
+	maxLenInCol = new size_t[size];
 	for (size_t i = 0; i < size; i++)
 	{
+		maxLenInCol[i] = 0;
 		rows[i] = new GridRow(*other.rows[i]);
 	}
 }
@@ -17,15 +19,18 @@ void Grid::free() {
 		}
 
 		delete[] rows;
+		delete[] maxLenInCol;
 	}
 }
 
 Grid::Grid(const size_t size) {
 	this->size = size;
 	rows = new GridRow*[size];
+	maxLenInCol = new size_t[size];
 	for (size_t i = 0; i < size; i++)
 	{
 		rows[i] = new GridRow(size);
+		maxLenInCol[i] = 0;
 	}
 }
 
@@ -48,12 +53,35 @@ const Grid& Grid::operator=(const Grid& other) {
 }
 
 void Grid::setItem(const size_t row, const size_t col, const Item* item) {
-	if (row >= size)
+	if (row == size)
 	{
 		throw "Wrong row";
 	}
+	
+	if (item->GetType() == ItemType::Formula)
+	{
+		Item* formulaResult = calculateWithFormula(item->getData());
+		// formulaResult->Print(cout);
+		cout << endl;
+		setItem(row, col, formulaResult);
+		this->rows[row - 1]->setItem(*item, col);
+		size_t dataLen = formulaResult->getValueLen();
+		if (maxLenInCol[col - 1] < dataLen)
+		{
+			maxLenInCol[col - 1] = dataLen;
+		}
+		delete formulaResult;
+	}
+	else {
 
-	this->rows[row]->setItem(*item, col);
+		this->rows[row - 1]->setItem(*item, col);
+		size_t dataLen = item->getValueLen();
+		if (maxLenInCol[col - 1] < dataLen)
+		{
+			maxLenInCol[col - 1] = dataLen;
+		}
+	}
+
 }
 
 void Grid::print(ostream& out) const {
@@ -65,14 +93,51 @@ void Grid::print(ostream& out) const {
 	}
 }
 
+void Grid::printWithSpaces(ostream& out) const {
+	out << size << endl;
+	for (size_t i = 0; i < size; i++)
+	{
+		rows[i]->Print(out, maxLenInCol);
+	}
+	out << endl;
+}
+
 void Grid::read(istream& in) {
 	char newLine = '\n';
 	in.get(newLine);
 	for (size_t i = 0; i < size; i++)
 	{
 		rows[i] = new GridRow(size);
-		rows[i]->read(in);
-		in.get(newLine);
+		this->size = size;
+		for (size_t j = 0; j < size; j++)
+		{
+			string itemData;
+			getline(in, itemData, '|');
+			if (itemData != "")
+			{
+				GridRow* row = rows[i];
+				Item* newItem = itemFactory.createItem(itemData);
+				rows[i]->setItem(newItem, j);
+				size_t dataLen = newItem ->getValueLen();
+				if (maxLenInCol[j] < dataLen)
+				{
+					maxLenInCol[j] = dataLen;
+				}
+			}
+			else 
+			{
+				Item* gridItem = rows[i]->operator[](j);
+				gridItem = nullptr;
+			}
+		}
+
+		/*rows[i]->read(in);
+		size_t dataLen = rows[i]->getValueLen();
+		if (maxLenInCol[col - 1] < dataLen)
+		{
+			maxLenInCol[col - 1] = dataLen;
+		}
+		in.get(newLine);*/
 	}
 }
 
@@ -182,5 +247,10 @@ Item* Grid::calculateWithFormula(const string& formula) const {
 }
 
 float Grid::getItemValue(const size_t row, const size_t col) const {
-	return rows[row]->getItemValue(col);
+	if (row == 0 || row > size)
+	{
+		throw "Wrong row";
+	}
+
+	return rows[row-1]->getItemValue(col);
 }

@@ -21,3 +21,15 @@ void StringItem::Read(istream& in) {
 float StringItem::getValue() const {
 	return 0;
 }
+
+size_t StringItem::getValueLen() const {
+	return data.length();
+}
+
+void StringItem::Print(ostream& out, const size_t len) const {
+	out << data << setw(len - getValueLen());
+};
+
+string StringItem::getData() const {
+	return data;
+}

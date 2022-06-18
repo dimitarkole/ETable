@@ -61,10 +61,32 @@ void GridRow::Print(ostream& out) const {
 	}
 }
 
+void  GridRow::Print(ostream& out, const size_t* lens) const {
+	for (size_t i = 0; i < size; i++)
+	{
+		if (items[i] != nullptr)
+		{
+			(*items[i]).Print(out, lens[i]);
+		}
+		else {
+			out<<setw(lens[i]);
+		}
+
+		out << "|";
+	}
+}
+
+
 void GridRow::setItem(const Item& item, const size_t col) {
-	if (col > size) throw "Wrong col";
+	if (col >= size) throw "Wrong col";
+	delete this->items[col - 1];
+	this->items[col -1] = item.Clone();
+}
+
+void GridRow::setItem(const Item* item, const size_t col) {
+	if (col >= size) throw "Wrong col";
 	delete this->items[col];
-	this->items[col] = item.Clone();
+	this->items[col] = item->Clone();
 }
 
 const Item* GridRow::operator[](const size_t index) const {
@@ -101,10 +123,10 @@ void GridRow::read(istream& in) {
 }
 
 float GridRow::getItemValue(const size_t col) const {
-	if (col > size)
+	if (col == 0 || col > size)
 	{
 		throw "Wrong row";
 	}
 
-	return this->items[col]->getValue();
+	return this->items[col - 1]->getValue();
 }
