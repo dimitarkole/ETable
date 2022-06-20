@@ -18,5 +18,4 @@ public:
 	size_t getValueLen() const override;
 	void Print(ostream& out, const size_t len) const;
 	string getData() const override;
-	size_t getValueLen() const = 0;
 };

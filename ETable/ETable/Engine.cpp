@@ -71,6 +71,7 @@ void Engine::run() {
     catch (const std::exception& ex)
     {
         cout << "ERR: " << ex.what();
+        delete this->grid;
     }
 }
 

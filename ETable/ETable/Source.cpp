@@ -1,5 +1,15 @@
+#pragma once
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "doctest.h"
+#include "ItemFactory.h"
+#include "grid.h"
 
+ItemFactory itemFactory;
 
+TEST_SUITE("Grid Tests")
+{
+   
+}
 
 //#include <iostream>
 //#include "Grid.h"

@@ -10,3 +10,4 @@ bool isNumberFloat(const string& str);
 int convertToNumber(const string& str);
 bool isContainsNumbers(const string& str);
 float convertToFloatNumber(const string& str);
+size_t getNumberFromFormula(const string& formula, size_t& startIndex);

@@ -52,17 +52,17 @@ const Grid& Grid::operator=(const Grid& other) {
 	return *this;
 }
 
-void Grid::setItem(const size_t row, const size_t col, const Item* item) {
-	if (row == size)
+void Grid::setItem(const size_t row, const size_t col, const string& data) {
+	if (row == size && row == 0)
 	{
 		throw "Wrong row";
 	}
-	
+
+	Item* item = itemFactory.createItem(data);
 	if (item->GetType() == ItemType::Formula)
 	{
-		Item* formulaResult = calculateWithFormula(item->getData());
-		// formulaResult->Print(cout);
-		cout << endl;
+		Item* formulaResult = calculateFormula(item->getData());
+		formulaResult->Print(cout);
 		setItem(row, col, formulaResult);
 		this->rows[row - 1]->setItem(*item, col);
 		size_t dataLen = formulaResult->getValueLen();
@@ -81,7 +81,37 @@ void Grid::setItem(const size_t row, const size_t col, const Item* item) {
 			maxLenInCol[col - 1] = dataLen;
 		}
 	}
+	delete item;
+}
 
+void Grid::setItem(const size_t row, const size_t col, const Item* item) {
+	if (row == size && row == 0)
+	{
+		throw "Wrong row";
+	}
+	
+	if (item->GetType() == ItemType::Formula)
+	{
+		Item* formulaResult = calculateFormula(item->getData());
+		formulaResult->Print(cout);
+		setItem(row, col, formulaResult);
+		this->rows[row - 1]->setItem(*formulaResult, col);
+		size_t dataLen = formulaResult->getValueLen();
+		if (maxLenInCol[col - 1] < dataLen)
+		{
+			maxLenInCol[col - 1] = dataLen;
+		}
+		delete formulaResult;
+	}
+	else {
+
+		this->rows[row - 1]->setItem(*item, col);
+		size_t dataLen = item->getValueLen();
+		if (maxLenInCol[col - 1] < dataLen)
+		{
+			maxLenInCol[col - 1] = dataLen;
+		}
+	}
 }
 
 void Grid::print(ostream& out) const {
@@ -159,91 +189,58 @@ GridRow& Grid::operator[](const size_t index) {
 	return *rows[index];
 }
 
-Item* Grid::calculateWithFormula(const string& formula) const {
-	float result = 0;
-	size_t formulaLen = formula.length(), index = 1, row = 0, col = 0;
-	bool hasCell;
-	int number = 1;
-	float value = 1;
-	char sign = '*';
-	while(index < formulaLen)
+Item* Grid::calculateFormula(const string& formula) const
+{
+	size_t formulaLen = formula.length();
+	int sum = 0;
+	char sign = '+';
+	for (size_t i = 0; i < formulaLen; i++)
 	{
-		//if (formula[index] == ' ' || formula[index] != '+' || formula[index] != '-') index++;
-		hasCell = false;
-		while (index < formulaLen && formula[index] != '+' && formula[index] != '-')
+		if (formula[i] == '+' || formula[i] == '-')
 		{
-			if (formula[index] == '*' || formula[index] == '/') sign = formula[index];
-			if (formula[index] == ' ' && formula[index + 1] != 'R')
-			{
-				number = 0;
-				index++;
-				while (index < formulaLen && formula[index] != 'R' && formula[index] != ' ')
-				{
-					number += formula[index] - '0';
-					index++;
-				}
-			}
+			sign = formula[i];
+		}
 
-			if (formula[index] == 'R')
-			{
-				hasCell = true;
-				index++;
-				row = 0;
-				while (index < formulaLen && formula[index] != 'C')
-				{
-					row += formula[index] - '0';
-					index++;
+		if ((formula[i] >= '0' && formula[i] <= '9') || formula[i] == 'R')
+		{
+			int value = 1;
+			char signV = '*';
+			do {
+				while (formula[i] == '*' || formula[i] == '/' || formula[i] == ' ') {
+					i++;
 				}
-			}
 
-			if (formula[index] == 'C')
-			{
-				index++;
-				col = 0;
-				while (index < formulaLen && formula[index] != ' ')
+				size_t number = 1;
+				if (formula[i] != 'R')
 				{
-					col += formula[index] - '0';
-					index++;
+					number = getNumberFromFormula(formula, i);
 				}
-			}
+				else if (formula[i] == 'R')
+				{
+					i++;
+					size_t row = getNumberFromFormula(formula, i);
+					i++;
+					size_t col = getNumberFromFormula(formula, i);
+					number = this->getItemValue(row, col);
+				}
 
-			if (formula[index] == '+' || formula[index] == '-')
-			{
-				row--;
-				col--;
-				if (hasCell) {
-					if (sign == '*')
-					{
-						value *= number * this->rows[row]->getItemValue(col);
+				signV = formulaLen > i + 1 && formula[i + 1] == '/' ? '/' : '*';
+				if (signV == '/')
+				{
+					if (number == 0) {
+						throw "Err: / 0 is unccurrect!";
 					}
-					else value /= number * this->rows[row]->getItemValue(col);
+					value /= number;
 				}
 				else value *= number;
-				number = 1;
-			}
-			index++;
+			} while (formulaLen > i + 1 && (formula[i + 1] == '*' || formula[i + 1] == '/'));
+
+			if (sign == '+') sum += value;
+			else sum -= value;
 		}
-
-		if (index >= formulaLen)
-		{
-			row--;
-			col--;
-			if (hasCell) {
-				if (sign == '*')
-				{
-					value *= number * this->rows[row]->getItemValue(col);
-				}
-				else value /= number * this->rows[row]->getItemValue(col);
-			}
-			else value *= number;
-			number = 1;
-		}
-
-
-		result += value;
 	}
 
-	return new FloatItem(result);
+	return new IntegerItem(sum);
 }
 
 float Grid::getItemValue(const size_t row, const size_t col) const {

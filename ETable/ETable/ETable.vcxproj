@@ -164,7 +164,7 @@
     <ClInclude Include="ItemFactory.h" />
     <ClInclude Include="StringItem.h" />
     <ClInclude Include="Item.h" />
-    <ClInclude Include="testGrid.cpp" />
+    <ClInclude Include="tests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

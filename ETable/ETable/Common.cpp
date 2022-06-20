@@ -1,5 +1,19 @@
 #include "Common.h"
 
+size_t getNumberFromFormula(const string& formula, size_t& startIndex)
+{
+	size_t number = 0;
+	size_t formulaLen = formula.length();
+	while (formulaLen > startIndex && (formula[startIndex] >= '0' && formula[startIndex] <= '9'))
+	{
+		number *= 10;
+		number += formula[startIndex] - '0';
+		startIndex++;
+	}
+
+	return number;
+}
+
 bool isContainsNumbers(const string& str) {
 	size_t strLen = str.length();
 	if (str == "") return false;
