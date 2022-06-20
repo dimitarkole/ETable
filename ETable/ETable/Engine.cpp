@@ -91,10 +91,10 @@ void Engine::printCommands()
 
 void Engine::inputGridFromConsole() {
     if (!willRefillGrid()) return;
-    cout << "Input grid size: ";
-    size_t size;
-    cin >> size;
-    Grid* grid = new Grid(size);
+    cout << "Input grid size (rows cols): ";
+    size_t rows, cols;
+    cin >> rows >> cols;
+    Grid* grid = new Grid(rows, cols);
     cout << "Set data in grid: (row col data/End)" << endl;
     string data = "";
     char newLine = '\n';
@@ -144,9 +144,9 @@ void Engine::readFrom(const string& fileName) {
 
     try
     {
-        size_t size;
-        file >> size;
-        Grid* grid = new Grid(size);
+        size_t rows, cols;
+        file >> rows >> cols;
+        Grid* grid = new Grid(rows, cols);
         grid->read(file);
         delete this->grid;
         this->grid = grid;

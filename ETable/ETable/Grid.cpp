@@ -1,10 +1,11 @@
 #include "Grid.h"
 
 void Grid::copyFrom(const Grid& other) {
-	size = other.size;
-	rows = new GridRow * [size];
-	maxLenInCol = new size_t[size];
-	for (size_t i = 0; i < size; i++)
+	rowsCount = other.rowsCount;
+	colsCount = other.colsCount;
+	rows = new GridRow * [rowsCount];
+	maxLenInCol = new size_t[rowsCount];
+	for (size_t i = 0; i < rowsCount; i++)
 	{
 		maxLenInCol[i] = 0;
 		rows[i] = new GridRow(*other.rows[i]);
@@ -13,7 +14,7 @@ void Grid::copyFrom(const Grid& other) {
 
 void Grid::free() {
 	if (this != nullptr) {
-		for (size_t i = 0; i < size; i++)
+		for (size_t i = 0; i < rowsCount; i++)
 		{
 			delete rows[i];
 		}
@@ -23,13 +24,14 @@ void Grid::free() {
 	}
 }
 
-Grid::Grid(const size_t size) {
-	this->size = size;
-	rows = new GridRow*[size];
-	maxLenInCol = new size_t[size];
-	for (size_t i = 0; i < size; i++)
+Grid::Grid(const size_t rows, const size_t cols) {
+	this->rowsCount = rows;
+	this->rows = new GridRow*[rowsCount];
+	colsCount = cols;
+	maxLenInCol = new size_t[cols];
+	for (size_t i = 0; i < rowsCount; i++)
 	{
-		rows[i] = new GridRow(size);
+		this->rows[i] = new GridRow(cols);
 		maxLenInCol[i] = 0;
 	}
 }
@@ -53,7 +55,7 @@ const Grid& Grid::operator=(const Grid& other) {
 }
 
 void Grid::setItem(const size_t row, const size_t col, const string& data) {
-	if (row == size && row == 0)
+	if (row > rowsCount || row == 0)
 	{
 		throw "Wrong row";
 	}
@@ -73,6 +75,11 @@ void Grid::setItem(const size_t row, const size_t col, const string& data) {
 		delete formulaResult;
 	}
 	else {
+		if (data == "123.56" || data == "123,56")
+		{
+			cout << "data: " << data << " item.type= " << item->GetType() 
+				<< " item.value= " << item->getValue() << endl;
+		}
 
 		this->rows[row - 1]->setItem(*item, col);
 		size_t dataLen = item->getValueLen();
@@ -85,7 +92,7 @@ void Grid::setItem(const size_t row, const size_t col, const string& data) {
 }
 
 void Grid::setItem(const size_t row, const size_t col, const Item* item) {
-	if (row == size && row == 0)
+	if (row > rowsCount || row == 0)
 	{
 		throw "Wrong row";
 	}
@@ -115,8 +122,8 @@ void Grid::setItem(const size_t row, const size_t col, const Item* item) {
 }
 
 void Grid::print(ostream& out) const {
-	out << size << endl;
-	for (size_t i = 0; i < size; i++)
+	out << rowsCount <<" " << colsCount << endl;
+	for (size_t i = 0; i < rowsCount; i++)
 	{
 		rows[i]->Print(out);
 		out << endl;
@@ -124,8 +131,8 @@ void Grid::print(ostream& out) const {
 }
 
 void Grid::printWithSpaces(ostream& out) const {
-	out << size << endl;
-	for (size_t i = 0; i < size; i++)
+	out << rowsCount << " " << colsCount << endl;
+	for (size_t i = 0; i < rowsCount; i++)
 	{
 		rows[i]->Print(out, maxLenInCol);
 	}
@@ -135,11 +142,10 @@ void Grid::printWithSpaces(ostream& out) const {
 void Grid::read(istream& in) {
 	char newLine = '\n';
 	in.get(newLine);
-	for (size_t i = 0; i < size; i++)
+	for (size_t i = 0; i < rowsCount; i++)
 	{
-		rows[i] = new GridRow(size);
-		this->size = size;
-		for (size_t j = 0; j < size; j++)
+		rows[i] = new GridRow(colsCount);
+		for (size_t j = 0; j < colsCount; j++)
 		{
 			string itemData;
 			getline(in, itemData, '|');
@@ -172,7 +178,8 @@ void Grid::read(istream& in) {
 }
 
 const GridRow& Grid::operator[](const size_t index) const{
-	if (index >= size)
+	if (index > rowsCount || index == 0)
+
 	{
 		throw "Wrong row";
 	}
@@ -181,7 +188,7 @@ const GridRow& Grid::operator[](const size_t index) const{
 }
 
 GridRow& Grid::operator[](const size_t index) {
-	if (index >= size)
+	if (index > rowsCount || index == 0)
 	{
 		throw "Wrong row";
 	}
@@ -192,7 +199,7 @@ GridRow& Grid::operator[](const size_t index) {
 Item* Grid::calculateFormula(const string& formula) const
 {
 	size_t formulaLen = formula.length();
-	int sum = 0;
+	float sum = 0;
 	char sign = '+';
 	for (size_t i = 0; i < formulaLen; i++)
 	{
@@ -203,14 +210,14 @@ Item* Grid::calculateFormula(const string& formula) const
 
 		if ((formula[i] >= '0' && formula[i] <= '9') || formula[i] == 'R')
 		{
-			int value = 1;
+			float value = 1;
 			char signV = '*';
 			do {
-				while (formula[i] == '*' || formula[i] == '/' || formula[i] == ' ') {
+				while (formula[i] == '*' || formula[i] == '/' || formula[i] == ' ' || formula[i] == '^') {
 					i++;
 				}
 
-				size_t number = 1;
+				float number = 1;
 				if (formula[i] != 'R')
 				{
 					number = getNumberFromFormula(formula, i);
@@ -224,7 +231,8 @@ Item* Grid::calculateFormula(const string& formula) const
 					number = this->getItemValue(row, col);
 				}
 
-				signV = formulaLen > i + 1 && formula[i + 1] == '/' ? '/' : '*';
+				signV = formulaLen > i + 1 && formula[i + 1] == '/' ? '/'
+						: formulaLen > i + 1 && formula[i + 1] == '^' ? '^' : '*';
 				if (signV == '/')
 				{
 					if (number == 0) {
@@ -232,19 +240,23 @@ Item* Grid::calculateFormula(const string& formula) const
 					}
 					value /= number;
 				}
+				else if (signV == '^')
+				{
+					value = pow(value, number);
+				}
 				else value *= number;
-			} while (formulaLen > i + 1 && (formula[i + 1] == '*' || formula[i + 1] == '/'));
+			} while (formulaLen > i + 1 && (formula[i + 1] == '*' || formula[i + 1] == '/' || formula[i + 1] == '^'));
 
 			if (sign == '+') sum += value;
 			else sum -= value;
 		}
 	}
 
-	return new IntegerItem(sum);
+	return new FloatItem(sum);
 }
 
 float Grid::getItemValue(const size_t row, const size_t col) const {
-	if (row == 0 || row > size)
+	if (row == 0 || row > rowsCount)
 	{
 		throw "Wrong row";
 	}

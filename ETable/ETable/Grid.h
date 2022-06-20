@@ -10,11 +10,12 @@ class Grid
 	ItemFactory itemFactory;
 	GridRow** rows;
 	size_t* maxLenInCol;
-	size_t size;
+	size_t rowsCount;
+	size_t colsCount;
 	void copyFrom(const Grid& other);
 	void free();
 public:
-	Grid(const size_t size = 0);
+	Grid(const size_t rows, const size_t cols);
 	Grid(const Grid& other);
 	Grid(const Grid&& other) = delete;
 	~Grid();

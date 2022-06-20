@@ -78,13 +78,13 @@ void  GridRow::Print(ostream& out, const size_t* lens) const {
 
 
 void GridRow::setItem(const Item& item, const size_t col) {
-	if (col >= size) throw "Wrong col";
+	if (col > size || col == 0) throw "Wrong col";
 	delete this->items[col - 1];
 	this->items[col -1] = item.Clone();
 }
 
 void GridRow::setItem(const Item* item, const size_t col) {
-	if (col >= size) throw "Wrong col";
+	if (col > size || col == 0) throw "Wrong col";
 	delete this->items[col];
 	this->items[col] = item->Clone();
 }
@@ -128,5 +128,6 @@ float GridRow::getItemValue(const size_t col) const {
 		throw "Wrong row";
 	}
 
+	if (this->items[col - 1] == nullptr) return 0;
 	return this->items[col - 1]->getValue();
 }
