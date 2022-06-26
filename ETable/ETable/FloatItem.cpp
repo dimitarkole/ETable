@@ -27,8 +27,10 @@ float FloatItem::getValue() const {
 size_t FloatItem::getValueLen() const {
 	int copyNumber = abs(number);
 	size_t pow = 1;
+	//int count = 0;
 	while (round(copyNumber * pow) != number * pow) {
 		pow *= 10;
+		//count++;
 	}
 
 	return trunc(log10(abs(copyNumber))) + 1 + (number < 0); // number len + sign

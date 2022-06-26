@@ -68,9 +68,9 @@ void Engine::run() {
         } while (command != "End");
         delete this->grid;
     }
-    catch (const std::exception& ex)
+    catch (const char* ex)
     {
-        cout << "ERR: " << ex.what();
+        cout << "Err: " << ex << endl;
         delete this->grid;
     }
 }
@@ -101,14 +101,14 @@ void Engine::inputGridFromConsole() {
     size_t indexOfEndOfRow, indexOfEndOfCol, col, row;
     cin.get(newLine);
     getline(cin, data, '\n');
+    isGridSet = true;
+
     while (data != "End") {
         changeItem(data);
         getline(cin, data);
     }
-
     delete this->grid;
     this->grid = grid;
-    isGridSet = true;
 }
 
 void Engine::saveAs(const string& fileName) const {
@@ -127,8 +127,9 @@ void Engine::saveAs(const string& fileName) const {
     {
         grid->print(file);
     }
-    catch (const std::exception&)
+    catch (const char* ex)
     {
+        cout << "Err: " << ex << endl;
     }
 }
 
@@ -152,8 +153,9 @@ void Engine::readFrom(const string& fileName) {
         this->grid = grid;
         isGridSet = true;
     }
-    catch (const std::exception&)
+    catch (const char* ex)
     {
+        cout << "Err: " << ex<<endl;
     }
 }
 
@@ -162,6 +164,7 @@ void Engine::changeItem(const string& data) {
         cout << "No any data in grid" << endl;
         return;
     }
+
     size_t indexOfEndOfRow, indexOfEndOfCol, col, row;
     indexOfEndOfRow = data.find(' ');
     indexOfEndOfCol = data.find(' ', indexOfEndOfRow + 1);

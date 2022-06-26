@@ -26,7 +26,7 @@ void Grid::free() {
 
 Grid::Grid(const size_t rows, const size_t cols) {
 	this->rowsCount = rows;
-	this->rows = new GridRow*[rowsCount];
+	this->rows = new GridRow*[cols];
 	colsCount = cols;
 	maxLenInCol = new size_t[cols];
 	for (size_t i = 0; i < rowsCount; i++)
@@ -135,6 +135,7 @@ void Grid::printWithSpaces(ostream& out) const {
 	for (size_t i = 0; i < rowsCount; i++)
 	{
 		rows[i]->Print(out, maxLenInCol);
+		out << endl;
 	}
 	out << endl;
 }
@@ -151,19 +152,13 @@ void Grid::read(istream& in) {
 			getline(in, itemData, '|');
 			if (itemData != "")
 			{
-				GridRow* row = rows[i];
 				Item* newItem = itemFactory.createItem(itemData);
-				rows[i]->setItem(newItem, j);
+				rows[i]->setItem(newItem, j + 1);
 				size_t dataLen = newItem ->getValueLen();
 				if (maxLenInCol[j] < dataLen)
 				{
 					maxLenInCol[j] = dataLen;
 				}
-			}
-			else 
-			{
-				Item* gridItem = rows[i]->operator[](j);
-				gridItem = nullptr;
 			}
 		}
 
